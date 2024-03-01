@@ -10,7 +10,6 @@ const getData = async () => {
     try {
         const querySnapshot = await getDocs(dataCollection);
 
-        // modify as needed
         querySnapshot.forEach((doc) => {
             console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
         });
@@ -19,14 +18,29 @@ const getData = async () => {
     }
 };
 
+const getDataByUID = async (UID) => {
+    try {
+        const userDocRef = doc(dataCollection, UID);
+        const docSnapshot = await getDocs(userDocRef);
+
+        if (docSnapshot.exists()) {
+            console.log(`${docSnapshot.id} => ${JSON.stringify(docSnapshot.data())}`);
+        } else {
+            console.log(`Document with UID ${UID} not found`);
+        }
+    } catch (error) {
+        console.error("Error getting document by UID: ", error);
+    }
+};
+
+
 const addData = async (UID, data) => {
     try {
         const userDocRef = doc(dataCollection, UID);
-        const docRef = await setDoc(userDocRef, data, {merge: true});
-        // await addDoc(documentRef, data);
+        await setDoc(userDocRef, data, {merge: true});
     } catch (error) {
         console.error("Error adding document: ", error);
     }
 };
 
-export {getData, addData};
+export {getData, getDataByUID, addData};

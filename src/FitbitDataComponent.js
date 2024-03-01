@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {getData, addData} from './backend/dbHandler';
+import {getData, addData, getDataByUID} from './backend/dbHandler';
 
 
 const FitbitDataComponent = () => {
@@ -81,10 +81,10 @@ const FitbitDataComponent = () => {
             heartrate: 123,
             time: "yipppeeee!"
         }
-        addData(await getUID(accessToken), await getProfile(accessToken));
+        const UID = await getUID(accessToken);
+        addData(UID, await getProfile(accessToken));
+        console.log(await getDataByUID(UID))
     }
-
-
 
     const APIRequest = async (endpoint, requestHeaders) => {
         const response = await fetch(endpoint, requestHeaders);
@@ -108,7 +108,7 @@ const FitbitDataComponent = () => {
 
         const profileData = await APIRequest(profileEndpoint, profileHeaders);
         setProfile(profileData);
-        return profileData
+        return profileData;
     };
 
     const getUID = async (accessToken) => {
