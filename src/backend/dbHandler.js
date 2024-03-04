@@ -6,6 +6,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const dataCollection = collection(db, "users");
 
+/* Get all data within collection */
 const getData = async () => {
     try {
         const querySnapshot = await getDocs(dataCollection);
@@ -18,6 +19,7 @@ const getData = async () => {
     }
 };
 
+/* Get data from specific document within the collection */
 const getDataByUID = async (UID) => {
     try {
         const userDocRef = doc(dataCollection, UID);
@@ -33,7 +35,7 @@ const getDataByUID = async (UID) => {
     }
 };
 
-
+/* Write data into document with new ID "UID". If it exists, the data will be merged into the existing ID */
 const addData = async (UID, data) => {
     try {
         const userDocRef = doc(dataCollection, UID);
