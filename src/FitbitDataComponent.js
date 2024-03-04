@@ -58,7 +58,8 @@ const FitbitDataComponent = () => {
             if (response.ok) {
                 const data = await response.json();
                 const accessToken = data.access_token;
-
+                console.log(JSON.stringify(accessToken));
+                console.log(accessToken);
                 // Now you can use the access token to make requests to the Fitbit API
                 functionsRan(accessToken);
             }
