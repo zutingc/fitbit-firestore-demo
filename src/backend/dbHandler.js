@@ -22,11 +22,11 @@ const getData = async () => {
 /* Get data from specific document within the collection */
 const getDataByUID = async (UID) => {
     try {
-        const userDocRef = doc(dataCollection, UID);
-        const docSnapshot = await getDocs(userDocRef);
+        const querySnapshot = await getDocs(dataCollection);
+        const document = querySnapshot.docs.find(doc => doc.id === UID);
 
-        if (docSnapshot.exists()) {
-            console.log(`${docSnapshot.id} => ${JSON.stringify(docSnapshot.data())}`);
+        if (document) {
+            console.log(`${document.id} => ${JSON.stringify(document.data())}`);
         } else {
             console.log(`Document with UID ${UID} not found`);
         }

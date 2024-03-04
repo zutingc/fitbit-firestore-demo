@@ -4,9 +4,14 @@ import FitbitDataComponent from './fitbit/FitbitDataComponent';
 
 function BackendDemo({ accessToken }) {
   useEffect(() => {
-    const { getProfile, getUID, getHeartRateTimeSeries } = FitbitDataComponent({ accessToken });
+    const fetchData = async () => {
+      if (!accessToken) {
+        // Display a loading message or return early
+        return;
+      }
 
-    const functionsRan = async () => {
+      const { getProfile, getUID, getHeartRateTimeSeries } = FitbitDataComponent({ accessToken });
+
       try {
         const UID = await getUID();
         getDataByUID(UID).then((data) => {
@@ -22,11 +27,11 @@ function BackendDemo({ accessToken }) {
 
         console.log('UID:', UID);
       } catch (error) {
-        console.error('Error in functionsRan:', error);
+        console.error('Error in fetchData:', error);
       }
     };
 
-    functionsRan();
+    fetchData();
   }, [accessToken]);
 
   return (
