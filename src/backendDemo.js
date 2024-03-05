@@ -72,9 +72,9 @@ function BackendDemo({ accessToken }) {
     <div>
       <p><b>UID: </b> {UID}</p>
       <hr />
-      <p><b>All data from collection: </b>{JSON.stringify(allData)}</p>
+      <b>All data from collection: </b><pre>{JSON.stringify(allData)}</pre>
       <hr />
-      <p><b>Data From UID {"(should be your data)"}: </b>{JSON.stringify(UIDData)}</p>
+      <b>Data From UID {"(should be your data)"}: </b><pre>{JSON.stringify(UIDData)}</pre>
     </div>
   );
 }
