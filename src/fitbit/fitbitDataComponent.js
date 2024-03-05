@@ -1,9 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { getData, addData, getDataByUID } from '../backend/dbHandler';
-
 /*  ------------------------------ API Calls ------------------------------  */
-
-// ... (your existing code)
 
 const FitbitDataComponent = ({ accessToken }) => {
     const APIRequest = async (endpoint, requestHeaders) => {
