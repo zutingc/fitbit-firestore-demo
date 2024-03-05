@@ -15,10 +15,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/register" element={<Register />} />
-        <Route path="/" element={<Login />} />
-        <Route path="/backendDemo" element={<BackendDemo />} />
-
-        {/* <Route path="*" element={<Navigate to="/login" />} /> */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<BackendDemo />} />
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   );

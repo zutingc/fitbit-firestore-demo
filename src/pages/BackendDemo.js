@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+
 import dbHandler from '../backend/dbHandler';
 import FitbitDataComponent from '../fitbit/fitbitDataComponent';
 import { useFitbitAuth } from '../fitbit/fitbitAuth';
@@ -18,9 +20,11 @@ function BackendDemo() {
   const [UID, setUID] = useState("");
   const [allData, setAllData] = useState("");
   const [UIDData, setUIDData] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const accessToken = useFitbitAuth();
 
   useEffect(() => {
+
     const demoFunctions = async () => {
       // Ensure that the access token is ready 
       if (!accessToken) {
@@ -28,13 +32,21 @@ function BackendDemo() {
       }
 
       // Import functions from Firestore db component
-      // I'm retrieving data from a collections "users" which I manually greated on Firestore
+      // I'm retrieving data from a collections "users" which I manually created on Firestore
       const { getAllData, getDataByDocID, addData } = dbHandler({ collectionName: "users/" });
 
       // Import functions from Fitbit data component
       const { getProfile, getUID, getHeartRateTimeSeries } = FitbitDataComponent({ accessToken });
 
       try {
+        // Observe the authentication state to get the current user's email
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            setUserEmail(user.email);
+          }
+        });
+
         // Use FitBit UID as Firestore document ID to organize the users' data
         const UID = await getUID();
         console.log('UID:', UID); // demo
@@ -73,6 +85,7 @@ function BackendDemo() {
   return (
     <div>
       <p><b>UID: </b> {UID}</p>
+      <p><b>User Email: </b> {userEmail}</p>
       <hr />
       <b>All data from collection: </b><pre>{JSON.stringify(allData)}</pre>
       <hr />
