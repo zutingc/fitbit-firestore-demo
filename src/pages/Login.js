@@ -15,7 +15,7 @@ const Login = () => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
-                navigate('/backendDemo');
+                navigate('/');
             }
         });
 
@@ -28,7 +28,7 @@ const Login = () => {
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 console.log(userCredential); // demo
-                navigate('/backendDemo');
+                navigate('/');
             })
             .catch((error) => {
                 console.log(error);

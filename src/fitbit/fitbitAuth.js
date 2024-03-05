@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {ClientID, ClientSecret, RedirectUri} from "./fitbitConfig";
+import { ClientID, ClientSecret, RedirectUri } from "./fitbitConfig";
 
 /************ Change for your app *************/
 const clientId = ClientID;
@@ -11,31 +11,30 @@ const redirectUri = RedirectUri; // the redirectURL in FitBit app
 const useFitbitAuth = () => {
     const [accessToken, setAccessToken] = useState("");
 
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const authorizationCode = urlParams.get('code');
+    const urlParams = new URLSearchParams(window.location.search);
+    const authorizationCode = urlParams.get('code');
 
-        const authenticateFitbit = async () => {
-            if (authorizationCode) {
-                try {
-                    const token = await handleAuthorizationCode(authorizationCode);
-                    setAccessToken(token);
-                } catch (error) {
-                    console.error('Error handling authorization code:', error);
-                }
-            } else {
-                initiateAuthentication();
+    const authenticateFitbit = async () => {
+        if (authorizationCode) {
+            try {
+                const token = await handleAuthorizationCode(authorizationCode);
+                setAccessToken(token);
+            } catch (error) {
+                console.error('Error handling authorization code:', error);
             }
-        };
+        } else {
+            initiateAuthentication();
+        }
+    };
 
-        authenticateFitbit();
-    }, []);
+    authenticateFitbit();
 
     return accessToken;
 };
 
 const initiateAuthentication = () => {
-    const scope = 'activity+cardio_fitness+electrocardiogram+heartrate+location+nutrition+oxygen_saturation+profile+respiratory_rate+settings+sleep+social+temperature+weight'; /************* Add other scopes as needed *************/
+    /************* Edit scopes as needed *************/
+    const scope = 'activity+cardio_fitness+electrocardiogram+heartrate+location+nutrition+oxygen_saturation+profile+respiratory_rate+settings+sleep+social+temperature+weight';
     // Construct the Fitbit authorization URL
     const authorizationEndpoint = `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
 
@@ -75,4 +74,4 @@ const handleAuthorizationCode = async (code) => {
     }
 };
 
-export {useFitbitAuth, initiateAuthentication, handleAuthorizationCode};
+export { useFitbitAuth, initiateAuthentication, handleAuthorizationCode };

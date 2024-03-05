@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useNavigate, Link } from "react-router-dom";
+
 
 import dbHandler from '../backend/dbHandler';
 import FitbitDataComponent from '../fitbit/fitbitDataComponent';
@@ -23,17 +25,19 @@ function BackendDemo() {
   const [userEmail, setUserEmail] = useState("");
   const accessToken = useFitbitAuth();
 
-  useEffect(() => {
+  const [arg1, setArg1] = useState('');
+  const [arg2, setArg2] = useState('');
 
+  // Import functions from Firestore db component
+  // I'm retrieving data from a collections "users" which I manually created on Firestore
+  const { getAllData, getDataByDocID, addData } = dbHandler({ collectionName: "users/" });
+
+  useEffect(() => {
     const demoFunctions = async () => {
       // Ensure that the access token is ready 
       if (!accessToken) {
         return;
       }
-
-      // Import functions from Firestore db component
-      // I'm retrieving data from a collections "users" which I manually created on Firestore
-      const { getAllData, getDataByDocID, addData } = dbHandler({ collectionName: "users/" });
 
       // Import functions from Fitbit data component
       const { getProfile, getUID, getHeartRateTimeSeries } = FitbitDataComponent({ accessToken });
@@ -82,10 +86,39 @@ function BackendDemo() {
     demoFunctions();
   }, [accessToken]);
 
+  const handleSubmit = (e) => {
+    // Call the provided onSubmit function with the input values
+    e.preventDefault();
+    addData(UID, { [arg1]: arg2 })
+      .then(() => {
+        // After successfully adding data, refresh the displayed data
+        getAllData().then((data) => setAllData(data));
+        getDataByDocID(UID).then((data) => setUIDData(data));
+      })
+      .catch((error) => {
+        console.error('Error adding data:', error);
+      });
+  }
+
   return (
     <div>
+      <h1>Backend Demo</h1>
       <p><b>UID: </b> {UID}</p>
       <p><b>User Email: </b> {userEmail}</p>
+      <p><Link to="/login">Log in</Link> <Link to="/register">Register</Link></p>
+      <hr />
+      <p>Write Data:
+        <form onSubmit={handleSubmit}>
+          <label>
+            <input type="text" placeholder="field name" value={arg1} onChange={(e) => setArg1(e.target.value)} />
+          </label>
+          <label>
+            <input type="text" placeholder="field value" value={arg2} onChange={(e) => setArg2(e.target.value)} />
+          </label>
+          <button type="submit">Submit</button>
+        </form>
+
+      </p>
       <hr />
       <b>All data from collection: </b><pre>{JSON.stringify(allData)}</pre>
       <hr />
