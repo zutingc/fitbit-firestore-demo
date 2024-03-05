@@ -1,9 +1,9 @@
-import { clientId, clientSecret, redirectUri } from "./fitbitConfig";
+import {ClientID, ClientSecret, RedirectUri} from "./fitbitConfig";
 
 /************ Change for your app *************/
-const clientId = clientId;
-const clientSecret = clientSecret;
-const redirectUri = redirectUri; // the redirectURL in FitBit app
+const clientId = ClientID;
+const clientSecret = ClientSecret;
+const redirectUri = RedirectUri; // the redirectURL in FitBit app
 
 /*  ------------------------------ Authorization ------------------------------  */
 

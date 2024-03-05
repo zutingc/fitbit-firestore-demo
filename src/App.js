@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import Login from './Login';
-import BackendDemo from './backendDemo';
+import Login from './pages/Login';
+import BackendDemo from './pages/BackendDemo';
 import firebaseConfig from './backend/firebaseConfig';
 import { initializeApp } from 'firebase/app';
 import { handleAuthorizationCode, initiateAuthentication } from './fitbit/fitbitAuth';

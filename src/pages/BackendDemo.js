@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import dbHandler from './backend/dbHandler';
-import FitbitDataComponent from './fitbit/FitbitDataComponent';
+import dbHandler from '../backend/dbHandler';
+import FitbitDataComponent from '../fitbit/FitbitDataComponent';
 
 /*
 Recommended Reading:
