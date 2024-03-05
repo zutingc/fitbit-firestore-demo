@@ -1,46 +1,70 @@
-import { getFirestore, collection, getDocs, addDoc, doc, setDoc } from "firebase/firestore";
+import { getFirestore, collection, getDoc, getDocs, addDoc, doc, setDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import firebaseConfig from './firebaseConfig';
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const dataCollection = collection(db, "users");
 
-const getData = async () => {
-    try {
-        const querySnapshot = await getDocs(dataCollection);
+const dbHandler = ({ collectionName }) => {
+    const dataCollection = collection(db, collectionName);
 
-        querySnapshot.forEach((doc) => {
-            console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
-        });
-    } catch (error) {
-        console.error("Error getting documents: ", error);
-    }
-};
-
-const getDataByUID = async (UID) => {
-    try {
-        const userDocRef = doc(dataCollection, UID);
-        const docSnapshot = await getDocs(userDocRef);
-
-        if (docSnapshot.exists()) {
-            console.log(`${docSnapshot.id} => ${JSON.stringify(docSnapshot.data())}`);
-        } else {
-            console.log(`Document with UID ${UID} not found`);
+    /* Get all data within collection */
+    const getAllData = async () => {
+        try {
+            const querySnapshot = await getDocs(dataCollection);
+    
+            if (!querySnapshot || !querySnapshot.docs) {
+                console.error("No documents found in the query snapshot.");
+                return [];
+            }
+            // Use map to create an array of promises
+            const dataPromises = querySnapshot.docs.map(async (doc) => {
+                console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
+                return doc.data();
+            });
+    
+            // Use Promise.all to wait for all promises to resolve
+            const allData = await Promise.all(dataPromises);
+    
+            return allData;
+        } catch (error) {
+            console.error("Error getting documents: ", error);
+            return [];
         }
-    } catch (error) {
-        console.error("Error getting document by UID: ", error);
-    }
-};
+    };
 
+    /* Get data from specific document within the collection */
+    const getDataByDocID = async (docID) => {
+        try {
+            const docRef = doc(db, collectionName, docID);
+            const documentSnapshot = await getDoc(docRef);
 
-const addData = async (UID, data) => {
-    try {
-        const userDocRef = doc(dataCollection, UID);
-        await setDoc(userDocRef, data, {merge: true});
-    } catch (error) {
-        console.error("Error adding document: ", error);
-    }
-};
+            if (documentSnapshot.exists()) {
+                console.log(`${documentSnapshot.id} => ${JSON.stringify(documentSnapshot.data())}`);
+                return documentSnapshot.data();
+            } else {
+                console.log(`Document with ID ${docID} not found`);
+            }
+        } catch (error) {
+            console.error("Error getting document by ID: ", error);
+        }
+    };
 
-export {getData, getDataByUID, addData};
+    /* Write data into document ID of docID. If it exists, the data will be merged into the existing ID */
+    const addData = async (docID, data, mergeVal = true) => {
+        try {
+            const userDocRef = doc(dataCollection, docID);
+            await setDoc(userDocRef, data, {merge: mergeVal});
+        } catch (error) {
+            console.error("Error adding document: ", error);
+        }
+    };
+
+    return {
+        getDataByDocID,
+        getAllData,
+        addData
+      };
+}
+
+export default dbHandler;

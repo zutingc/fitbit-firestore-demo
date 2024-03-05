@@ -1,11 +1,44 @@
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import FitbitDataComponent from './FitbitDataComponent';
+import Login from './login';
+import BackendDemo from './backendDemo';
+import firebaseConfig from './backend/firebaseConfig';
+import { initializeApp } from 'firebase/app';
+import { handleAuthorizationCode, initiateAuthentication } from './fitbit/fitbitAuth';
+
+const app = initializeApp(firebaseConfig);
 
 function App() {
+  const [accessToken, setAccessToken] = useState("");
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const authorizationCode = urlParams.get('code');
+
+    if (authorizationCode) {
+      handleAuthorizationCode(authorizationCode)
+        .then((token) => {
+          setAccessToken(token);
+        })
+        .catch((error) => {
+          console.error('Error handling authorization code:', error);
+        });
+    } else {
+      initiateAuthentication();
+    }
+  }, []);
+
+
   return (
-    <div className="App">
-      <FitbitDataComponent/>
+    // <BrowserRouter>
+    //   <Routes>
+    //     <Route path="/" element={<Login />} />
+    //   </Routes>
+    // </BrowserRouter>
+    <div>
+      <h1>Hello.</h1>
+      <BackendDemo accessToken={accessToken}/>
     </div>
   );
 }
