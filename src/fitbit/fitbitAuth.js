@@ -1,7 +1,9 @@
+import { clientId, clientSecret, redirectUri } from "./fitbitConfig";
+
 /************ Change for your app *************/
-const clientId = '23RRZN';
-const clientSecret = '7e745be34f33726d916933190c116bd9';
-const redirectUri = 'https://ssw322-app.web.app/'; // the redirectURL in FitBit app
+const clientId = clientId;
+const clientSecret = clientSecret;
+const redirectUri = redirectUri; // the redirectURL in FitBit app
 
 /*  ------------------------------ Authorization ------------------------------  */
 
