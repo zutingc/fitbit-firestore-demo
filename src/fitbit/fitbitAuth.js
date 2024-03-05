@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import {ClientID, ClientSecret, RedirectUri} from "./fitbitConfig";
 
 /************ Change for your app *************/
@@ -6,6 +7,32 @@ const clientSecret = ClientSecret;
 const redirectUri = RedirectUri; // the redirectURL in FitBit app
 
 /*  ------------------------------ Authorization ------------------------------  */
+
+const useFitbitAuth = () => {
+    const [accessToken, setAccessToken] = useState("");
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const authorizationCode = urlParams.get('code');
+
+        const authenticateFitbit = async () => {
+            if (authorizationCode) {
+                try {
+                    const token = await handleAuthorizationCode(authorizationCode);
+                    setAccessToken(token);
+                } catch (error) {
+                    console.error('Error handling authorization code:', error);
+                }
+            } else {
+                initiateAuthentication();
+            }
+        };
+
+        authenticateFitbit();
+    }, []);
+
+    return accessToken;
+};
 
 const initiateAuthentication = () => {
     const scope = 'activity+cardio_fitness+electrocardiogram+heartrate+location+nutrition+oxygen_saturation+profile+respiratory_rate+settings+sleep+social+temperature+weight'; /************* Add other scopes as needed *************/
@@ -48,4 +75,4 @@ const handleAuthorizationCode = async (code) => {
     }
 };
 
-export {initiateAuthentication, handleAuthorizationCode};
+export {useFitbitAuth, initiateAuthentication, handleAuthorizationCode};

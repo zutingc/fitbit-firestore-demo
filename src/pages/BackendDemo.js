@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import dbHandler from '../backend/dbHandler';
-import FitbitDataComponent from '../fitbit/FitbitDataComponent';
+import FitbitDataComponent from '../fitbit/fitbitDataComponent';
+import { useFitbitAuth } from '../fitbit/fitbitAuth';
 
 /*
 Recommended Reading:
@@ -12,11 +13,12 @@ Documentation:
 - https://dev.fitbit.com/build/reference/web-api/
 */
 
-function BackendDemo({ accessToken }) {
+function BackendDemo() {
   // For demo purposes:
   const [UID, setUID] = useState("");
   const [allData, setAllData] = useState("");
   const [UIDData, setUIDData] = useState("");
+  const accessToken = useFitbitAuth();
 
   useEffect(() => {
     const demoFunctions = async () => {

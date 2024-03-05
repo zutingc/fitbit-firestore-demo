@@ -1,46 +1,63 @@
-// Login.js
-import React, { useState } from 'react';
-import firebaseConfig from '../backend/firebaseConfig';
-import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import React, { useState, useEffect } from "react";
+import firebaseConfig from "../backend/firebaseConfig";
+import { initializeApp } from "firebase/app";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed up 
-      const user = userCredential.user;
-      // ...
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // ..
-    });
-  };
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
-  return (
-    <div>
-      <h2>Login</h2>
-      <form>
-        <label>Email:</label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <br />
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                navigate('/backendDemo');
+            }
+        });
 
-        <label>Password:</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <br />
+        // Clean up the subscription on unmount
+        return () => unsubscribe();
+    }, [auth, navigate]);
 
-        <button type="button" onClick={handleLogin}>Login</button>
-      </form>
-    </div>
-  );
+    const login = (e) => {
+        e.preventDefault();
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                console.log(userCredential); // demo
+                navigate('/backendDemo');
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    return (
+        <div className="sign-in-container">
+            <form onSubmit={login}>
+                <h1>Log In to your Account</h1>
+                <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                ></input>
+                <input
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                ></input>
+                <button type="submit">Log In</button>
+            </form>
+            <p>
+                <Link to="/register">Don't have an account? Register here</Link>
+            </p>
+        </div>
+    );
 };
 
 export default Login;
