@@ -1,46 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useNavigate, Link } from "react-router-dom";
-
-
+import React, { useState, useLayoutEffect } from 'react';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { Link } from 'react-router-dom';
 import dbHandler from '../backend/dbHandler';
 import FitbitDataComponent from '../fitbit/fitbitDataComponent';
 import { useFitbitAuth } from '../fitbit/fitbitAuth';
 
-/*
-Recommended Reading:
-- https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Introducing
-- https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Promises
-
-Documentation:
-- https://firebase.google.com/docs/firestore
-- https://dev.fitbit.com/build/reference/web-api/
-*/
-
 function BackendDemo() {
-  // For demo purposes:
-  const [UID, setUID] = useState("");
-  const [allData, setAllData] = useState("");
-  const [UIDData, setUIDData] = useState("");
-  const [userEmail, setUserEmail] = useState("");
+  const [UID, setUID] = useState('');
+  const [allData, setAllData] = useState('');
+  const [UIDData, setUIDData] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const accessToken = useFitbitAuth();
 
   const [arg1, setArg1] = useState('');
   const [arg2, setArg2] = useState('');
 
   // Import functions from Firestore db component
-  // I'm retrieving data from a collections "users" which I manually created on Firestore
-  const { getAllData, getDataByDocID, addData } = dbHandler({ collectionName: "users/" });
+  const { getAllData, getDataByDocID, addData } = dbHandler({ collectionName: 'users/' });
 
-  useEffect(() => {
+  // Import functions from Fitbit data component
+  const { getProfile, getUID, getHeartRateTimeSeries } = FitbitDataComponent({ accessToken });
+
+  // UseLayoutEffect is used here to ensure that UI is updated immediately after the data is fetched
+  useLayoutEffect(() => {
     const demoFunctions = async () => {
-      // Ensure that the access token is ready 
+      // Ensure that the access token is ready
       if (!accessToken) {
         return;
       }
-
-      // Import functions from Fitbit data component
-      const { getProfile, getUID, getHeartRateTimeSeries } = FitbitDataComponent({ accessToken });
 
       try {
         // Observe the authentication state to get the current user's email
@@ -53,13 +40,12 @@ function BackendDemo() {
 
         // Use FitBit UID as Firestore document ID to organize the users' data
         const UID = await getUID();
-        console.log('UID:', UID); // demo
-        setUID(UID); // demo
+        setUID(UID);
 
         // Data is in JSON. Here's some sample data
         const sampleData = {
           heartrate: 123,
-          test: "test string",
+          test: 'test string',
         };
 
         // Examples of writing data to Firestore
@@ -68,16 +54,13 @@ function BackendDemo() {
 
         // Get data from Firestore by UID
         getDataByDocID(UID).then((data) => {
-          console.log('Data by UID:', data); // demo
-          setUIDData(data); // demo
+          setUIDData(data);
         });
 
         // Get all data from collection
         getAllData().then((data) => {
-          console.log('All data from collection:', data); // demo
-          setAllData(data); // demo
+          setAllData(data);
         });
-
       } catch (error) {
         console.error('Error in demoFunctions:', error);
       }
@@ -98,7 +81,7 @@ function BackendDemo() {
       .catch((error) => {
         console.error('Error adding data:', error);
       });
-  }
+  };
 
   return (
     <div>
@@ -117,7 +100,6 @@ function BackendDemo() {
           </label>
           <button type="submit">Submit</button>
         </form>
-
       </p>
       <hr />
       <b>All data from collection: </b><pre>{JSON.stringify(allData)}</pre>
