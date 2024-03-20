@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { Link } from 'react-router-dom';
 import dbHandler from '../backend/dbHandler';
@@ -6,7 +6,8 @@ import FitbitDataComponent from '../fitbit/fitbitDataComponent';
 import { useFitbitAuth } from '../fitbit/fitbitAuth';
 
 function BackendDemo() {
-  const [UID, setUID] = useState('');
+  const [fitBitUID, setFitBitUID] = useState('');
+  const [firebaseUID, setFirebaseUID] = useState('');
   const [allData, setAllData] = useState('');
   const [UIDData, setUIDData] = useState('');
   const [userEmail, setUserEmail] = useState('');
@@ -21,62 +22,91 @@ function BackendDemo() {
   // Import functions from Fitbit data component
   const { getProfile, getUID, getHeartRateTimeSeries } = FitbitDataComponent({ accessToken });
 
-  // UseLayoutEffect is used here to ensure that UI is updated immediately after the data is fetched
-  useLayoutEffect(() => {
-    const demoFunctions = async () => {
-      // Ensure that the access token is ready
-      if (!accessToken) {
-        return;
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserEmail(user.email);
+        setFirebaseUID(user.uid);
       }
+    });
 
-      try {
-        // Observe the authentication state to get the current user's email
-        const auth = getAuth();
-        onAuthStateChanged(auth, (user) => {
-          if (user) {
-            setUserEmail(user.email);
-          }
-        });
-
-        // Use FitBit UID as Firestore document ID to organize the users' data
-        const UID = await getUID();
-        setUID(UID);
-
-        // Data is in JSON. Here's some sample data
-        const sampleData = {
-          heartrate: 123,
-          test: 'test string',
-        };
-
-        // Examples of writing data to Firestore
-        await addData(UID, await getProfile());
-        await addData(UID, sampleData);
-
-        // Get data from Firestore by UID
-        getDataByDocID(UID).then((data) => {
-          setUIDData(data);
-        });
-
-        // Get all data from collection
-        getAllData().then((data) => {
-          setAllData(data);
-        });
-      } catch (error) {
-        console.error('Error in demoFunctions:', error);
-      }
+    return () => {
+      unsubscribe();
     };
+  }, []);
 
-    demoFunctions();
-  }, [accessToken]);
+  function refreshData() {
+    // Get data from Firestore by UID
+    getDataByDocID(fitBitUID).then((data) => {
+      setUIDData(data);
+    });
+
+    // Get all data from collection
+    getAllData().then((data) => {
+      console.log(data);
+      setAllData(data);
+    });
+  };
+
+  const demoFunctions = async () => {
+    // Ensure that the access token is ready
+    if (!accessToken) {
+      return;
+    }
+
+    try {
+      // Observe the authentication state to get the current user's email
+      const auth = getAuth();
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          setUserEmail(user.email);
+        }
+      });
+
+      // Use FitBit UID as Firestore document ID to organize the users' data
+      setFitBitUID( await getUID());
+
+      // Data is in JSON. Here's some sample data
+      const sampleData = {
+        heartrate: 123,
+        test: 'test string',
+      };
+
+      // Examples of writing data to Firestore
+      // const addData: (docID: any, data: any, mergeVal?: boolean)
+      await addData(firebaseUID, await getProfile());
+      await addData(firebaseUID, sampleData);
+      // use the FitBit UID only to store user data
+      await addData(fitBitUID, await getHeartRateTimeSeries('2024-02-02', '1d'));
+      // use the Firebase UID to store data + link it to FitBit UID
+      await addData(firebaseUID, {firebaseEmail: userEmail});
+      await addData(firebaseUID, {fitBitUID: fitBitUID});
+
+      // Get data from Firestore by FitBit UID
+      getDataByDocID(fitBitUID).then((data) => {
+        setUIDData(data);
+      });
+
+      // Get all data from collection
+      getAllData().then((data) => {
+        setAllData(data);
+      });
+    } catch (error) {
+      console.error('Error in demoFunctions:', error);
+    }
+  };
+
+  demoFunctions();
 
   const handleSubmit = (e) => {
     // Call the provided onSubmit function with the input values
     e.preventDefault();
-    addData(UID, { [arg1]: arg2 })
+    addData(fitBitUID, { [arg1]: arg2 })
       .then(() => {
         // After successfully adding data, refresh the displayed data
         getAllData().then((data) => setAllData(data));
-        getDataByDocID(UID).then((data) => setUIDData(data));
+        getDataByDocID(fitBitUID).then((data) => setUIDData(data));
       })
       .catch((error) => {
         console.error('Error adding data:', error);
@@ -86,7 +116,8 @@ function BackendDemo() {
   return (
     <div>
       <h1>Backend Demo</h1>
-      <p><b>UID: </b> {UID}</p>
+      <p><b>Firebase Auth UID: </b> {firebaseUID}</p>
+      <p><b>FitBit UID: </b> {fitBitUID}</p>
       <p><b>User Email: </b> {userEmail}</p>
       <p><Link to="/login">Log in</Link> <Link to="/register">Register</Link></p>
       <hr />
