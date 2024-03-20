@@ -56,16 +56,9 @@ function BackendDemo() {
     }
 
     try {
-      // Observe the authentication state to get the current user's email
-      const auth = getAuth();
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          setUserEmail(user.email);
-        }
-      });
-
       // Use FitBit UID as Firestore document ID to organize the users' data
-      setFitBitUID( await getUID());
+      setFitBitUID(await getUID());
+      console.log("hello " + fitBitUID);
 
       // Data is in JSON. Here's some sample data
       const sampleData = {
@@ -78,14 +71,15 @@ function BackendDemo() {
       await addData(firebaseUID, await getProfile());
       await addData(firebaseUID, sampleData);
       // use the FitBit UID only to store user data
-      await addData(fitBitUID, await getHeartRateTimeSeries('2024-02-02', '1d'));
+      // await addData(fitBitUID, await getHeartRateTimeSeries('2024-02-02', '1d'));
       // use the Firebase UID to store data + link it to FitBit UID
       await addData(firebaseUID, {firebaseEmail: userEmail});
       await addData(firebaseUID, {fitBitUID: fitBitUID});
 
       // Get data from Firestore by FitBit UID
-      getDataByDocID(fitBitUID).then((data) => {
+      getDataByDocID(firebaseUID).then((data) => {
         setUIDData(data);
+
       });
 
       // Get all data from collection
@@ -115,7 +109,7 @@ function BackendDemo() {
 
   return (
     <div>
-      <h1>Backend Demo</h1>
+      <h1>FitBit & Firestore Demo</h1>
       <p><b>Firebase Auth UID: </b> {firebaseUID}</p>
       <p><b>FitBit UID: </b> {fitBitUID}</p>
       <p><b>User Email: </b> {userEmail}</p>
