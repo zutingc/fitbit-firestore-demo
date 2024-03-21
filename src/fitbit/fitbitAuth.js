@@ -11,23 +11,29 @@ const redirectUri = RedirectUri; // the redirectURL in FitBit app
 const useFitbitAuth = () => {
     const [accessToken, setAccessToken] = useState("");
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const authorizationCode = urlParams.get('code');
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const authorizationCode = urlParams.get('code');
 
-    const authenticateFitbit = async () => {
-        if (authorizationCode) {
-            try {
-                const token = await handleAuthorizationCode(authorizationCode);
-                setAccessToken(token);
-            } catch (error) {
-                console.error('Error handling authorization code:', error);
+        const authenticateFitbit = async () => {
+            if (accessToken) {
+                return;
             }
-        } else {
-            initiateAuthentication();
-        }
-    };
 
-    authenticateFitbit();
+            if (authorizationCode) {
+                try {
+                    const token = await handleAuthorizationCode(authorizationCode);
+                    setAccessToken(token);
+                } catch (error) {
+                    console.error('Error handling authorization code:', error);
+                }
+            } else {
+                initiateAuthentication();
+            }
+        };
+
+        authenticateFitbit();
+    }, [accessToken]);
 
     return accessToken;
 };
@@ -64,6 +70,7 @@ const handleAuthorizationCode = async (code) => {
         if (response.ok) {
             const data = await response.json();
             const accessToken = data.access_token;
+            console.log("Fitbit Auth Component: " + accessToken);
             return accessToken;
         }
         else {

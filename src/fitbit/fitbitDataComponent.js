@@ -1,6 +1,9 @@
 /*  ------------------------------ API Calls ------------------------------  */
 
 const FitbitDataComponent = ({ accessToken }) => {
+
+    console.log("Fitbit Data Component: " + accessToken);
+
     const APIRequest = async (endpoint, requestHeaders) => {
       const response = await fetch(endpoint, requestHeaders);
   

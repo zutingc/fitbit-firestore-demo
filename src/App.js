@@ -6,7 +6,6 @@ import Login from './pages/Login';
 import BackendDemo from './pages/BackendDemo';
 import firebaseConfig from './backend/firebaseConfig';
 import { initializeApp } from 'firebase/app';
-import { handleAuthorizationCode, initiateAuthentication } from './fitbit/fitbitAuth';
 
 const app = initializeApp(firebaseConfig);
 
