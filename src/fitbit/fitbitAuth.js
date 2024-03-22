@@ -70,7 +70,6 @@ const handleAuthorizationCode = async (code) => {
         if (response.ok) {
             const data = await response.json();
             const accessToken = data.access_token;
-            console.log("Fitbit Auth Component: " + accessToken);
             return accessToken;
         }
         else {
