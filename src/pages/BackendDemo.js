@@ -36,7 +36,6 @@ function BackendDemo() {
                     });
 
                     const UID = await getUID();
-                    console.log('UID:', UID);
                     setUID(UID);
 
                     const sampleData = {
@@ -51,6 +50,7 @@ function BackendDemo() {
                         console.log('Data by UID:', data);
                         setUIDData(data);
                     });
+
 
                     getAllData().then((data) => {
                         console.log('All data from collection:', data);
